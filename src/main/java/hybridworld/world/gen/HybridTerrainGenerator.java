@@ -14,6 +14,7 @@ import io.github.opencubicchunks.cubicchunks.core.worldgen.generator.vanilla.Van
 import io.github.opencubicchunks.cubicchunks.cubicgen.CustomCubicMod;
 import io.github.opencubicchunks.cubicchunks.cubicgen.customcubic.CustomGeneratorSettings;
 import io.github.opencubicchunks.cubicchunks.cubicgen.customcubic.CustomTerrainGenerator;
+import io.github.opencubicchunks.cubicchunks.cubicgen.preset.CustomGenSettingsSerialization;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.IChunkGenerator;
@@ -37,7 +38,7 @@ public class HybridTerrainGenerator extends VanillaCompatibilityGenerator {
 		} else {
 			settings = DefaultGeneratorSettings.get(dimension);
 			if (settings != null)
-				saveJsonStringToSaveFolder(world, FILE_NAME, settings.toJson());
+				saveJsonStringToSaveFolder(world, FILE_NAME, settings.toJsonObject().toJson(CustomGenSettingsSerialization.OUT_GRAMMAR));
 		}
 		if (settings == null)
 			return;
@@ -56,7 +57,8 @@ public class HybridTerrainGenerator extends VanillaCompatibilityGenerator {
 	@Override
 	public void populate(ICube cube) {
 		super.populate(cube);
-		if (cubicGenerator != null)
+		int cubeY = cube.getY();
+		if (cubicGenerator != null && (cubeY < 0 || cubeY >= 16))
 			cubicGenerator.populate(cube);
 	}
 

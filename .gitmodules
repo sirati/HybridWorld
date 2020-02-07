@@ -1,0 +1,6 @@
+[submodule "CubicChunks"]
+	path = CubicChunks
+	url = https://github.com/OpenCubicChunks/CubicChunks
+[submodule "CubicWorldGen"]
+	path = CubicWorldGen
+	url = https://github.com/OpenCubicChunks/CubicWorldGen

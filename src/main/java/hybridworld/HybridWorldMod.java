@@ -90,12 +90,12 @@ public class HybridWorldMod {
 	private static void autoRegister(RegistryEvent.Register<CubicBiome> event, Class<? extends Biome> cl,
 			Consumer<CubicBiome.Builder> cons) {
 		ForgeRegistries.BIOMES.getValuesCollection().stream()
-				.filter(x -> x.getRegistryName().getResourceDomain().equals("minecraft"))
+				.filter(x -> x.getRegistryName().getNamespace().equals("minecraft"))
 				.filter(x -> x.getClass() == cl).forEach(b -> {
 					CubicBiome.Builder builder = CubicBiome.createForBiome(b);
 					cons.accept(builder);
 					CubicBiome biome = builder.defaultPostDecorators()
-							.setRegistryName(MODID, b.getRegistryName().getResourcePath()).create();
+							.setRegistryName(MODID, b.getRegistryName().getPath()).create();
 					event.getRegistry().register(biome);
 				});
 	}

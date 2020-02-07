@@ -1,9 +1,5 @@
 package hybridworld.world.gen;
 
-import java.util.Arrays;
-
-import javax.annotation.Nullable;
-
 import io.github.opencubicchunks.cubicchunks.api.world.ICube;
 import io.github.opencubicchunks.cubicchunks.cubicgen.customcubic.CustomGeneratorSettings;
 import io.github.opencubicchunks.cubicchunks.cubicgen.customcubic.CustomGeneratorSettings.StandardOreConfig;
@@ -11,6 +7,9 @@ import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
+
+import javax.annotation.Nullable;
+import java.util.Arrays;
 
 public class DefaultGeneratorSettings {
 	
@@ -51,11 +50,8 @@ public class DefaultGeneratorSettings {
         settings.dungeons = true;
 
         settings.dungeonCount = 1;
-        settings.waterLakes = false;
-        
-        settings.lavaLakes = true;
-        settings.lavaLakeRarity = 1;
-        settings.aboveSeaLavaLakeRarity = 1;
+        settings.lakes.removeIf(lc -> Blocks.WATER == lc.block.getBlock() || Blocks.FLOWING_WATER == lc.block.getBlock());
+
         settings.lavaOceans = true;
 
         settings.biome = Biome.getIdForBiome(Biomes.HELL);
@@ -98,17 +94,17 @@ public class DefaultGeneratorSettings {
         settings.replacerConfig.setDefault(new ResourceLocation("cubicgen:ocean_block"), Blocks.LAVA.getDefaultState());
         
         {
-            settings.standardOres.addAll(Arrays.asList(
+            settings.standardOres.list.addAll(Arrays.asList(
                     StandardOreConfig.builder()
-                    		.genInBlockstates(Blocks.NETHERRACK.getDefaultState())
+                            .genInBlockstates(Blocks.NETHERRACK.getDefaultState())
                             .block(Blocks.QUARTZ_ORE.getDefaultState())
                             .size(17).attempts(10).probability(1f / (256f / ICube.SIZE)).create(),
                     StandardOreConfig.builder()
-            				.genInBlockstates(Blocks.NETHERRACK.getDefaultState())
+                            .genInBlockstates(Blocks.NETHERRACK.getDefaultState())
                             .block(Blocks.GLOWSTONE.getDefaultState())
                             .size(6).attempts(8).probability(2f / (256f / ICube.SIZE)).create(),
                     StandardOreConfig.builder()
-            				.genInBlockstates(Blocks.NETHERRACK.getDefaultState())
+                            .genInBlockstates(Blocks.NETHERRACK.getDefaultState())
                     		.block(Blocks.SOUL_SAND.getDefaultState())
                     		.size(33).attempts(10).probability(1f / (256f / ICube.SIZE)).create(),
                     StandardOreConfig.builder()
@@ -147,11 +143,9 @@ public class DefaultGeneratorSettings {
         settings.dungeons = false;
 
         settings.dungeonCount = 7;
-        settings.waterLakes = false;
-        
-        settings.lavaLakes = false;
-        settings.lavaLakeRarity = 1;
-        settings.aboveSeaLavaLakeRarity = 1;
+        settings.lakes.removeIf(lc -> Blocks.WATER == lc.block.getBlock() || Blocks.FLOWING_WATER == lc.block.getBlock()
+                || Blocks.LAVA == lc.block.getBlock() || Blocks.FLOWING_LAVA == lc.block.getBlock());
+
         settings.lavaOceans = false;
 
         settings.biome = Biome.getIdForBiome(Biomes.SKY);
