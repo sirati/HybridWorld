@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.CharBuffer;
 
+import hybridworld.world.gen.structure.feature.CubicCaveConnectorGenerator;
+import io.github.opencubicchunks.cubicchunks.api.util.CubePos;
 import io.github.opencubicchunks.cubicchunks.api.world.ICube;
 import io.github.opencubicchunks.cubicchunks.api.worldgen.CubePrimer;
 import io.github.opencubicchunks.cubicchunks.core.worldgen.generator.vanilla.VanillaCompatibilityGenerator;
@@ -15,17 +17,26 @@ import io.github.opencubicchunks.cubicchunks.cubicgen.CustomCubicMod;
 import io.github.opencubicchunks.cubicchunks.cubicgen.customcubic.CustomGeneratorSettings;
 import io.github.opencubicchunks.cubicchunks.cubicgen.customcubic.CustomTerrainGenerator;
 import io.github.opencubicchunks.cubicchunks.cubicgen.preset.CustomGenSettingsSerialization;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class HybridTerrainGenerator extends VanillaCompatibilityGenerator {
 
 	private static final String FILE_NAME = "custom_generator_settings.json";
-	private CustomTerrainGenerator cubicGenerator;
+	private CustomTerrainGenerator2 cubicGenerator;
+	private final World world;
+	private CubicCaveConnectorGenerator caveConnectorGenerator;
 	
 	public HybridTerrainGenerator(IChunkGenerator vanilla, World world) {
 		super(vanilla, world);
+		this.world = world;
 		this.onLoad(world);
 	}
 
@@ -42,13 +53,25 @@ public class HybridTerrainGenerator extends VanillaCompatibilityGenerator {
 		}
 		if (settings == null)
 			return;
-		this.cubicGenerator = new CustomTerrainGenerator(world, world.getBiomeProvider(), settings, world.getSeed());
+		this.cubicGenerator = new CustomTerrainGenerator2(world, world.getBiomeProvider(), settings, world.getSeed());
+		this.caveConnectorGenerator = new CubicCaveConnectorGenerator(cubicGenerator.getCaveGenerator(), cubicGenerator.getRavineGenerator());
 	}
 
 	@Override
 	public CubePrimer generateCube(int cubeX, int cubeY, int cubeZ) {
-		if (cubeY >= 0 && cubeY < 16)
-			return super.generateCube(cubeX, cubeY, cubeZ);
+		if (cubeY >= 0 && cubeY < 16) {
+			CubePrimer result = super.generateCube(cubeX, cubeY, cubeZ);
+			CubePos pos =  new CubePos(cubeX, cubeY, cubeZ);
+			if (cubeY == 0 || cubeY == 15) {
+				cubicGenerator.generateStructures(result,pos);
+			} else {
+				if (cubeY == 1) {
+					caveConnectorGenerator.generate(this.world, result, pos);
+				}
+				cubicGenerator.getStrongholds().generate(this.world, result, pos);
+			}
+			return result;
+		}
 		if (cubicGenerator == null)
 			return super.generateCube(cubeX, cubeY, cubeZ);
 		return cubicGenerator.generateCube(cubeX, cubeY, cubeZ);
@@ -117,4 +140,21 @@ public class HybridTerrainGenerator extends VanillaCompatibilityGenerator {
 		}
 		return vanillaStructurePos;
 	}
+
+	public class CustomTerrainGenerator2 extends CustomTerrainGenerator {
+		public CustomTerrainGenerator2(World world, long seed) {
+			super(world, seed);
+		}
+
+		public CustomTerrainGenerator2(World world, BiomeProvider biomeProvider, CustomGeneratorSettings settings, long seed) {
+			super(world, biomeProvider, settings, seed);
+		}
+
+		@Override
+		public void reloadPreset(String settings) {
+			super.reloadPreset(settings);
+			caveConnectorGenerator = new CubicCaveConnectorGenerator(getCaveGenerator(), getRavineGenerator());
+		}
+	}
+
 }

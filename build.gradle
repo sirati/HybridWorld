@@ -47,7 +47,7 @@ minecraft {
 
 dependencies {
     // for runeimt dependency, put them in mods/
-    compileOnly files('lib/CubicWorldGen-1.12.2-0.0.138.0-SNAPSHOT-dev.jar')
+    compileOnly files('lib/CubicWorldGen-1.12.2-0.0.142.0-SNAPSHOT-dev.jar')
     compileOnly files('lib/CubicChunks-1.12.2-0.0.1178.0-SNAPSHOT-dev.jar')
     //compile("io.github.opencubicchunks:cubicchunks-api:1.12.2-0.0-SNAPSHOT")
 }
